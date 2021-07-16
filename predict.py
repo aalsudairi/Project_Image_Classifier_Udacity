@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 from PIL import Image
+import argparse 
+
+image_size  = 224
 
 def process_numpy_image(numpy_image):
   processed_image = tf.convert_to_tensor(numpy_image, dtype=tf.float32)
@@ -43,7 +46,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Prediction of flower label')
 
     parser.add_argument('--input', action='store', dest='input', default='./test_images/cautleya_spicata.jpg')
-    parser.add_argument('--model', action='store', dest='model', default='./1625998552.h5')
+    parser.add_argument('--model', action='store', dest='model', default='./model.h5')
     parser.add_argument('--top_k', action='store', dest='top_k', default=5, type=int)
     parser.add_argument('--category_names', action='store', dest="category_names", default='./label_map.json')
 
@@ -54,16 +57,16 @@ if __name__ == '__main__':
     top_k = args.top_k
     category_names_path = args.category_names
 
-    model = reloaded_keras_model = tf.keras.models.load_model('./1625998552.h5', custom_objects={'KerasLayer':hub.KerasLayer},compile=False)
+    model = reloaded_keras_model = tf.keras.models.load_model('./model.h5', custom_objects={'KerasLayer':hub.KerasLayer},compile=False)
 
 
-    image_probs, image_classes = predict(input_image_path, model, top_k)
+    image_probs, image_classes, image = predict(input_image_path, model, top_k)
 
     class_names = load_class_names(category_names_path)
 
     processed_class_names = []
     for label in image_classes:
-        processed_class_names.append(class_names[label])
+        processed_class_names.append(class_names[str(label+1)])
 
     print_result(image_probs, processed_class_names)
 
